@@ -1,0 +1,834 @@
+---
+title: "Multidimensional Scaling: The Schwartz Basic Values circle"
+author: "Victoria Bolotova"
+date: "18 03 2023"
+output: 
+    html_document:
+      theme: cosmo
+      code_folding: show
+      toc: true
+      toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Idea of the Research
+
+In this project I am going to apply the Schwartz's theory "Basic Values circle" (1992) to study human values of people in Sweden. I decided to consider the case of Sweden since Swedish society is based on two main principles - equality and solidarity among people, which reflects care for other people. Besides, there is a Swedish philosophy "Lagom", which roughly translates to “not too much, not too little" - having what you need and nothing more. Hence, people there prefer moderation and restraint in every thing. I hypothesize that swedes have strong preferences for values of self-transcendence, and at the same time they do not like to show individual excellence in accordance with their philosophy "Lagom" - values of self-enhancement are not close to them. Thus, Sweden is an interesting case to apply Schwartz's theory "Basic Values circle" (1992). 
+
+Data: European Social Survey (Round 9 - 2018): https://ess-search.nsd.no/en/study/bdc7c350-1029-4cb3-9d5e-53f668b8fa74 
+
+
+## Desciption of variables
+
+Below you can see a description of items and a meaning of corresponding values. 
+
+![](./values.png)
+
+
+# Data Preprocessing 
+
+```{r}
+library(dplyr)
+library(foreign)
+library(haven)
+library(ggplot2)
+all_df <- read_sav("ESS.sav")
+all_df <- all_df %>% haven::as_factor()
+
+df <- all_df %>%
+  filter(cntry == "Sweden")
+
+df <- df %>% 
+  dplyr::select(- name, - essround, - edition, - proddate, - idno, - cntry, - dweight, -pspwght, - pweight, -anweight, - prob, - stratum, - psu)
+
+df <- na.omit(df)
+df <- droplevels(df) #drop missing values
+```
+
+# EDA 
+
+Let's explore the distribution of each 21 value item one by one to understand what human values appeal to swedes. 
+
+## Universalism 
+
+Most of the swedes think that universalism is important.
+
+### Ipeqopt
+
+He thinks it is important that every person in the world should be treated equally. He believes everyone should have equal opportunities in life.
+
+```{r}
+universalism_barplot  <- df %>% 
+  group_by(ipeqopt) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(universalism_barplot, aes(x = ipeqopt, y = percentage, fill = ipeqopt)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="Everyone should have equal opportunities in life") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+### lpudrst
+
+It is important to him to listen to people who are different from him. Even when he disagrees with them, he still wants to understand them.
+
+
+```{r}
+universalism_barplot  <- df %>% 
+  group_by(ipudrst) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(universalism_barplot, aes(x = ipudrst, y = percentage, fill = ipudrst)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="It is important to him to listen to people who are different from him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+### Impenv
+
+He strongly believes that people should care for nature. Looking after the environment is important to him.
+
+```{r}
+impenv_barplot  <- df %>% 
+  group_by(impenv) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(impenv_barplot, aes(x = impenv, y = percentage, fill = impenv)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He strongly believes that people should care for nature") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+## Benevolence
+
+Benevolence appeals to the most swedes. For swedes (96%) it is especially important to devote himself to people close to him
+
+### Iphlppl
+
+It is very important to him to help the people around him. He wants to care for their well-being.
+
+```{r}
+iphlppl_barplot  <- df %>% 
+  group_by(iphlppl) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(iphlppl_barplot, aes(x = iphlppl, y = percentage, fill = iphlppl)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="It is very important to him to help the people around him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+### Iplylfr
+
+It is important to him to be loyal to his friends. He wants to devote himself to people close to him.
+
+```{r}
+iplylfr_barplot  <- df %>% 
+  group_by(iplylfr) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(iplylfr_barplot, aes(x = iplylfr, y = percentage, fill = iplylfr)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He wants to devote himself to people close to him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+## Tradition
+
+As for modesty, most swedes (~75%) indeed try not to draw attention to themselves. As for tradition, it is not to highlty valued as modesty, but still more than a half of swedes tries to follow the custom handed down by religion or family.
+
+### Ipmodst
+
+It is important to him to be humble and modest. He tries not to draw attention to himself.
+
+```{r}
+ipmodst_barplot  <- df %>% 
+  group_by(ipmodst) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipmodst_barplot, aes(x = ipmodst, y = percentage, fill = ipmodst)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="It is important to him to be humble and modest") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+### Imptrad
+
+Tradition is important to him. He tries to follow the custom handed down by his religion or his family.
+
+```{r}
+imptrad_barplot  <- df %>% 
+  group_by(imptrad) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(imptrad_barplot, aes(x = imptrad, y = percentage, fill = imptrad)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="Tradition is important to him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+## Conformity
+
+As for conformity value, swedes split up approximately equally. 
+
+### Ipfrule
+
+He believes that people should do what they are told. He thinks people should follow rules at all times, even when no one is watching.
+
+```{r}
+ipfrule_barplot  <- df %>% 
+  group_by(ipfrule) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipfrule_barplot, aes(x = ipfrule, y = percentage, fill = ipfrule)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He believes that people should do what they are told") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+### Ipbhprp
+
+It is important to him always to behave properly. He wants to avoid doing anything people
+would say is wrong.
+
+```{r}
+ipbhprp_barplot  <- df %>% 
+  group_by(ipbhprp) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipbhprp_barplot, aes(x = ipbhprp, y = percentage, fill = ipbhprp)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He wants to avoid doing anything people would say is wrong") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+## Security
+
+For a little more than a half of swedes security is important. 
+
+### Impsafe
+
+It is important to him to live in secure surroundings. He avoids anything that might endanger
+his safety.
+
+```{r}
+impsafe_barplot  <- df %>% 
+  group_by(impsafe) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(impsafe_barplot, aes(x = impsafe, y = percentage, fill = impsafe)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He avoids anything that might endanger his safety") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+### Ipstrgv
+
+It is important to him that the government ensures his safety against all threats. He wants the state to be strong so it can defend its citizens.
+
+```{r}
+ipstrgv_barplot  <- df %>% 
+  group_by(ipstrgv) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipstrgv_barplot, aes(x = ipstrgv, y = percentage, fill = ipstrgv)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He wants the state to be strong so it can defend its citizens") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+## Power
+
+As expected, most swedes (more than 80%) do not want to have a lot of money and expensive things. Lagom philosophy indeed reflects values of most swedes. As for respect from other people, swedes split up equally.
+
+### Imprich
+
+It is important to him to be rich. He wants to have a lot of money and expensive things.
+
+```{r}
+imprich_barplot  <- df %>% 
+  group_by(imprich) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(imprich_barplot, aes(x = imprich, y = percentage, fill = imprich)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="It is important to him to be rich") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+###  Iprspot
+
+It is important to him to get respect from others. He wants people to do what he says.
+
+```{r}
+iprspot_barplot  <- df %>% 
+  group_by(iprspot) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(iprspot_barplot, aes(x = iprspot, y = percentage, fill = iprspot)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="It is important to him to get respect from others") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+## Achievement
+
+Values of achievement also does not appeals most swedes (more than a half). 
+
+### Ipshabt
+
+It is important to him to show his abilities. He wants people to admire what he does. 
+
+```{r}
+ipshabt_barplot  <- df %>% 
+  group_by(ipshabt) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipshabt_barplot, aes(x = ipshabt, y = percentage, fill = ipshabt)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="It is important to him to get respect from others") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+### Ipsuces
+
+Being very successful is important to him. He hopes people will recognize his achievements.
+
+```{r}
+ipsuces_barplot  <- df %>% 
+  group_by(ipsuces) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipsuces_barplot, aes(x = ipsuces, y = percentage, fill = ipsuces)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="Being very successful is important to him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+## Hedonism
+
+Having a good time and fun is important for more than 60% of swedes.
+
+### Ipgdtim
+
+Having a good time is important to him. He likes to "spoil" himself.
+
+```{r}
+ipgdtim_barplot  <- df %>% 
+  group_by(ipgdtim) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipgdtim_barplot, aes(x = ipgdtim, y = percentage, fill = ipgdtim)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="Having a good time is important to him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+### Impfun
+
+He seeks every chance he can to have fun. It is important to him to do things that give him pleasure.
+
+```{r}
+impfun_barplot  <- df %>% 
+  group_by(impfun) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(impfun_barplot, aes(x = impfun, y = percentage, fill = impfun)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He seeks every chance he can to have fun") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+## Stimulation
+
+About 60% of swedes like doing new things in life, but only ~ 40% looks for adventures and likes to take risks. 
+
+
+### Impdiff
+
+He likes surprises and is always looking for new things to do. He thinks it is important to do lots of different things in life.
+
+```{r}
+impdiff_barplot  <- df %>% 
+  group_by(impdiff) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(impdiff_barplot, aes(x = impdiff, y = percentage, fill = impdiff)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He likes surprises and is always looking for new things to do") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+### Ipadvnt
+
+He looks for adventures and likes to take risks. He wants to have an exciting life.
+
+```{r}
+ipadvnt_barplot  <- df %>% 
+  group_by(ipadvnt) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipadvnt_barplot, aes(x = ipadvnt, y = percentage, fill = ipadvnt)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He looks for adventures and likes to take risks") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+## Self-direction
+
+Self-direction is very important for most swedes.
+
+### Ipcrtiv
+
+Thinking up new ideas and being creative is important to him. He likes to do things in his own original way.
+
+```{r}
+ipcrtiv_barplot  <- df %>% 
+  group_by(ipcrtiv) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(ipcrtiv_barplot, aes(x = ipcrtiv, y = percentage, fill = ipcrtiv)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="Thinking up new ideas and being creative is important to him") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+### Impfree
+
+It is important to him to make his own decisions about what he does. He likes to be free and
+not depend on others.
+
+```{r}
+impfree_barplot  <- df %>% 
+  group_by(impfree) %>% 
+ dplyr::summarize(count = n()) %>%  
+ mutate(percentage = count/sum(count)) 
+
+ggplot(impfree_barplot, aes(x = impfree, y = percentage, fill = impfree)) + 
+  geom_bar(stat='identity') + 
+  geom_text(aes(label=scales::percent(percentage)), position = position_stack(vjust = .5)) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x="", 
+       y="",
+       title="He likes to be free and not depend on others") +
+  scale_fill_manual("Level of education", values = c('#6a994e', '#a7c957', '#f2e8cf', '#ff6f59', '#db504a', '#bc4749')) + 
+  theme_classic() + 
+  theme(legend.position="none")
+```
+
+
+# CFA
+
+First of all, we need to run CFA to check whether the value theory of Schwartz (1992) can be validated on the swedish data.
+
+
+Make all variables numeric:
+
+```{r}
+df[sapply(df, is.factor)] <- lapply(df[sapply(df, is.factor)], as.numeric) #make variables numeric
+```
+
+
+## Syntax
+
+Create a syntax for the respective theoretical model
+
+```{r}
+library(lavaan)
+model1 <- '
+universalism =~ ipeqopt + ipudrst + impenv 
+benevolence =~ iphlppl + iplylfr
+tradition =~ ipmodst + imptrad 
+conformity =~ ipfrule + ipbhprp
+security =~ impsafe + ipstrgv
+power =~ imprich + iprspot
+achievement =~ ipshabt + ipsuces
+hedonism =~ ipgdtim + impfun
+stimulation =~ impdiff + ipadvnt
+self_direction =~ ipcrtiv + impfree
+'
+```
+
+## Fitting
+
+```{r}
+fit <- cfa(model1, data = df)
+
+summary(fit, standardized=TRUE, fit.measures=TRUE, modindices=FALSE)
+```
+
+## Interpretation 
+
+* Tucker-Lewis Index (TLI) is close to good (0.85)
+* Comparative Fit Index (CFI) is also close to good (0.90)
+* RMSEA index equals to 0.056 (<.08 acceptable, <.05 excellent), which is good
+* SRMR equals to 0.047, which is excellent
+
+-> In accordance with above indexes, the model is good, but
+
+P-value of Chi-square equals to 0.000, which says to us that the model is different from data, but all important indexes confirmed that the model is good, thus, we can be sure in this model.
+
+* As for factor loadings, all of them are significant according to p-values (0.000).
+
+Thus, we can proceed with this theoretical model and our data on peoples' values in Sweden.
+
+# Internal Reliability
+
+In accordance with the article *"Measuring the 4 Higher-Order Values in Schwartz’s Theory: A Validation of a 17-Item Inventory"*, I should also check internal reliability of scales with Cronbach’s alpha (𝛼). 
+
+## Universalism
+
+```{r}
+library(ltm)
+
+df_universalism <- df %>%
+  dplyr::select(ipeqopt, ipudrst)
+
+cronbach.alpha(df_universalism)
+```
+## Benevolence
+
+```{r}
+df_benevolence <- df %>%
+  dplyr::select(iphlppl, iplylfr)
+
+cronbach.alpha(df_benevolence)
+```
+## Tradition
+
+```{r}
+df_tradition <- df %>%
+  dplyr::select(ipmodst, imptrad)
+
+cronbach.alpha(df_tradition)
+```
+* Very poor result.
+
+## Security
+
+```{r}
+df_security <- df %>%
+  dplyr::select(impsafe, ipstrgv)
+
+cronbach.alpha(df_security)
+```
+## Power
+
+```{r}
+df_power <- df %>%
+  dplyr::select(imprich, iprspot)
+
+cronbach.alpha(df_power)
+```
+## Achievement
+
+```{r}
+df_achievement <- df %>%
+  dplyr::select(ipshabt, ipsuces)
+
+cronbach.alpha(df_achievement)
+```
+## Hedonism
+
+```{r}
+df_hedonism <- df %>%
+  dplyr::select(ipgdtim, impfun)
+
+cronbach.alpha(df_hedonism)
+```
+## Stimulation 
+
+```{r}
+df_stimulation <- df %>%
+  dplyr::select(impdiff, ipadvnt)
+
+cronbach.alpha(df_stimulation)
+```
+## Self-direction
+
+```{r}
+df_self_direction <- df %>%
+  dplyr::select(ipcrtiv, impfree)
+
+cronbach.alpha(df_self_direction)
+```
+Most of the Cronbach's alpha results are lower than 0.7, which is not acceptable. Thus, it is better to proceed working with all 21 variables, although CFA model was acceptable.  
+
+# Unfolding
+
+## Preparation for unfolding
+
+### Centering by rows
+
+* We need to apply ipsatization for our data to make estimations of values more objective, since some people are prone to agree with every statement, while others, on the contrary, they tend to disagree with every given item. 
+
+```{r}
+library(Seurat)
+matrix <- data.matrix(df)
+matrix_centered <- FastRowScale(matrix, center = TRUE, scale = FALSE)
+df_centered <- as.data.frame(matrix_centered)
+min(df_centered)
+```
+
+After centering rows, we get negative values, which is not acceptable for unfolding. Let's add 4 to all values to make them non-negative
+
+### Make non-negative
+
+```{r}
+df_ready <- df_centered + 4
+min(df_ready)
+```
+
+Great!
+
+Next crucial step is to transform our data from similarities to dissimilarities
+
+### From similarities to dissimilarities
+
+```{r}
+library(smacof)
+sd <- sim2diss(df_ready, method = "reverse")
+```
+
+As we work with rectangular matrix, we need to apply unfolding.
+
+## Unfolding
+
+### Stress-1 value
+
+```{r}
+values_unf <- unfolding(sd)
+values_unf
+```
+
+* Stress-1 value equals to 0.18, which is acceptable, but not ideal.
+
+### SPP graphs 
+
+```{r fig.width=16, fig.height=8}
+plot(values_unf, plot.type = "stressplot")
+```
+
+Next I look at the SPP and check for influential observations. There are no influential outliers on the person side (1 observation has a SPP higher than 0.3). 
+
+On the variable side, the highest SPP values are the following: 
+
+* `imptrad` - importance of traditions (8%); 
+* `ipstrgv` - important that government ensures his safety against all threats (6.2%)
+* `ipfrule` - thinks that people should do what they are told (6.2%)
+* `impsafe` - avoids anything that might endanger his safety (6.2%). 
+
+Other variables have SPP values lower than 6%. 
+
+I conclude that no variable and no observation is an obvious outlier, thus, we can proceed with all observations and all variables. 
+
+
+### Random stress check
+
+```{r}
+stressvec <- randomstress(n=21, ndim = 2, nrep = 100, type = "ordinal")
+mean(stressvec)
+```
+
+* The average of 100 random dissimilarity matrices that fitted an MDS, equals to 0.3, which tells us that observed configuration (stress = 0.18) is better than random (stress = 0.3). 
+
+
+### Permutation test
+
+```{r}
+permtest(values_unf, sd, nrep = 100, verbose = F)
+```
+
+* Since p-value is smaller than 0.05, we reject the H0 here, meaning that the observed configuration is not random, but has some structure within.
+
+## Visualization of Unfolding
+
+```{r fig.width=8, fig.height= 8}
+library(ggplot2)
+library(ggrepel)
+
+conf_items <- as.data.frame(values_unf$conf.col)
+
+ggplot(conf_items, aes(x = D1, y = D2)) +
+  geom_point(size = 1, colour = "red", alpha = 0.5) + 
+  coord_fixed(xlim = c(-1.5, 1.5), ylim = c(-1.5, 1.5)) + 
+  xlab("") +
+  ylab("") +
+  geom_point(aes(x = D1, y = D2), conf_items, colour = "cadetblue") + 
+  geom_text_repel(aes(x = D1, y = D2, label = rownames(conf_items)), 
+            conf_items, colour = "cadetblue", vjust = 0.8) +
+  ggtitle("Unfolding for Semantic Differential: Human Values of People in Sweden") +
+  theme_bw()
+```
+
+The graph below may be better for the ease of intepretation
+
+![](./unfolding_plot.png)
+
+This graph shows the location of all 21 items in a two-dimensional MDS space. 
+
+- Findings:
+
+  - The configurations of 21 items reflect the approximately circular structure of individual values of people in Sweden as hypothesized by Schwartz (1992), which is interesting result.
+  
+  - At the very top of the graph there are closely located items that measure **universalism** (`ipeqopt`, `ipudrst`, `impenv`) and **benevolence** (`iphlppl`, `iplylfr`) - corresponds to the theory. All these 5 items oppose to variables located at the very bottom that measure **power** (`imprich`, `iprspot`) and **achievement** (`ipshabt`, `ipsuces`). Such location of items corresponds to the theory "The Schwartz Basic Values circle", where *self-enhancement* (power and achievement) is opposing to *self-transcendence* (benevolence and universalism). 
+  
+  - At the bottom right there are variables that measure **security** (`impsafe`, `ipstrgv`),
+**tradition** (one variable only - `imptrad`), and **conformity** (`ipfrule`, `ipbhprp`). One of the **tradition** item `ipmodst` (It is important to him to be humble and modest) is located between values of **universalism** and **benevolence** and between **security**, **tradition**, and **conformity**. All these 3 basic values (security, conformity, tradition) that generally reflect *conservation* oppose to variables, that measure **self-direction** (`impfree`, `ipcrtiv`) and **hedonism** (one variable only - `impfun`). Just below on the left there are other 3 variables that measure **hedonism** (one variable only - `ipgdtim`) and **stimulation** (`impdiff`, `ipadvnt`) - all of them corresponds to *openness to change*.
+
+  - In general, the items intended to measure the same higher-order value were consistently located close to each other (except for one of the **tradition** item `ipmodst`), forming two sets of opposing poles: Openness vs. Conservation and Self-Enhancement vs. Self-Transcendence, respectively.
+
+
